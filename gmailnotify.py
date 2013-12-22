@@ -1,27 +1,80 @@
 __author__ = 'tapan'
 #!/usr/bin/python3
+import urllib                                 # Import library to do http request
+import sys                                    # Import library to do command line arguments
+import base64                                 # Library to encode and decoded username and password
+from xml.dom.minidom import  parseString      # xml parser library
+import os
 
-from xml.dom.minidom import  parseString
-
-class GmailNotify:
+class GmailNotify:                            # Main class for the gmailnotify
     def __init__(self):
-        pass
-    def readFile(self):
+        self.user=dict()                      #Dict to store the username and password
+
+    def pasrseXml(self):                       # Method to parse the xml file
         xmlfile=open('gmail.xml')
         data=xmlfile.read()
         xmlfile.close()
-        dom=parseString(data)
+        dom=parseString(data)                 # Parsing the data
 
+        # Print header message and number of unread messages
+        xmlTag=dom.getElementsByTagName('title')[0].toxml()
+        xmlData=xmlTag.replace('<title>','').replace('</title>','')
+        print(xmlData.center(80,' '))
+        print("You have {} unread new messages".format(len(dom.getElementsByTagName('title'))-1))
+        print("-------------------------------------------------------------------------")
 
-        for k in range(0,len(dom.getElementsByTagName('title'))):
-           xmlTag=dom.getElementsByTagName('title')[k].toxml()
-           xmlData=xmlTag.replace('<title>','').replace('</title>','')
-           print(xmlData,end='\n\n')
+        totalmessages=len(dom.getElementsByTagName('title'))         # Get total number of messages
 
+        # Print the name and title of each messages
+        # \033[91m like strings for setting the output text colour
+        for k in range(1,totalmessages):
+            xmlTagtitle=dom.getElementsByTagName('title')[k].toxml()
+            xmlDatatitle=xmlTagtitle.replace('<title>','').replace('</title>','')
+            xmlTagname=dom.getElementsByTagName('name')[k-1].toxml()
+            xmlDataname=xmlTagname.replace('<name>','').replace('</name>','')
+            print("\033[91m",xmlDataname.center(25,' '),end=' ')
+            print("\033[92m",xmlDatatitle)
+            print("\033[0m______________________________________________________________________________________________________________________")
 
+    def getUsercredentials(self):               # Method to get the username and password from the file
+        try:
+            credentialfile=open("~/.gmailnotifier/gmail.txt")
+            return True
+        except:
+            print("Your credential file is missing.Use 'python3 gmailnotify.py --config' to reconfigure it.")
+            return False
+
+    def createConfig(self):                    # Method to set the user configuration
+        filename=os.path.expanduser("~")+"/.gmailnotify/gmail.txt"
+        dirname=os.path.dirname(filename)
+        if not os.path.exists(dirname):
+            os.mkdir(dirname)
+        configfile=open(filename,'w')
+        username=input("Username:")
+        password=input("Password:")
+        username=base64.b64encode(bytes(username,"utf_8"))           # Encoding the username and password before writing to file
+        password=base64.b64encode(bytes(password,"utf_8"))
+        print(username,file=configfile)
+        print(password,file=configfile)
+        configfile.close()
 
 def main():
-    g=GmailNotify()
-    g.readFile()
+
+    g=GmailNotify()                                             # Created GmailNotify class object
+    if len(sys.argv)>2:                                         # Checking the the no. of command line arguments
+        print("gmailnotify.py takes only one argument.' Try gmailnotify.py --help' for help")
+    elif len(sys.argv)==2:
+        if sys.argv[1]=='--help':                               #If commadline arg is --help
+            print("help")
+        elif sys.argv[1]=='--about':                            #If commadline arg is --about
+            print("About")
+        elif sys.argv[1]=='--config':                           #If commadline arg is --config
+            print("Configuration")
+            g.createConfig()
+        elif len(sys.argv)==2:                                  #If commadline arg is invalid
+            print("Invalid argument")
+    else:                                                       # If there is no command line argument
+        if g.getUsercredentials():
+            g.pasrseXml()
 
 if __name__=="__main__":main()
