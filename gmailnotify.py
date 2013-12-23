@@ -1,11 +1,17 @@
-__author__ = 'tapan'
 #!/usr/bin/python3
+__author__ = 'tapan'
+
+# GmailNotify 1.0
+# A Terminal based Gmail notifier
+# By Tapan Prakash T
+
 from urllib.request import urlopen,HTTPBasicAuthHandler,HTTPPasswordMgrWithDefaultRealm,build_opener,install_opener
                                               # Import library to do http request
 import sys                                    # Import library to do command line arguments
 import base64                                 # Library to encode and decoded username and password
 from xml.dom.minidom import  parseString      # xml parser library
-import os
+import os                                     # For creating directory
+import getpass                                # library to get password from terminal without echoing to terminal
 
 class GmailNotify:                            # Main class for the gmailnotify
     def __init__(self):
@@ -49,37 +55,47 @@ class GmailNotify:                            # Main class for the gmailnotify
                 xmlDatatitle=xmlTagtitle.replace('<title>','').replace('</title>','')
                 xmlTagname=dom.getElementsByTagName('name')[k-1].toxml()
                 xmlDataname=xmlTagname.replace('<name>','').replace('</name>','')
-                print("\033[91m",xmlDataname.center(25,' '),end=' ')
+                print("\033[91m",xmlDataname.ljust(25,' '),end=' ')
                 print("\033[92m",xmlDatatitle)
                 print("\033[0m______________________________________________________________________________________________________________________")
         except:
             print("Error in connection")
-    def getUsercredentials(self):               # Method to get the username and password from the file
+    def getUsercredentials(self):                                   # Method to get the username and password from the file
         try:
             credentialfile=open(os.path.expanduser("~")+"/.gmailnotify/gmail.txt")
             credentialfiledata=credentialfile.readlines()
             self.user['username']=str(credentialfiledata[0]).strip()
             self.user['password']=str(credentialfiledata[1]).strip()
-            #print(self.user['username'])
-            #print(self.user['password'])
+            # print(self.user['username'])
+            # print(self.user['password'])
             return True
         except:
             print("Your credential file is missing.Use 'python3 gmailnotify.py --config' to reconfigure it.")
             return False
 
-    def createConfig(self):                    # Method to set the user configuration
+    def createConfig(self):                                           # Method to set the user configuration
         filename=os.path.expanduser("~")+"/.gmailnotify/gmail.txt"
         dirname=os.path.dirname(filename)
         if not os.path.exists(dirname):
             os.mkdir(dirname)
         configfile=open(filename,'w')
         username=input("Username:")
-        password=input("Password:")
-       # username=base64.b64encode(bytes(username,"utf_8"))           # Encoding the username and password before writing to file
-       # password=base64.b64encode(bytes(password,"utf_8"))
+        password=getpass.getpass('Password:')
+        #username=base64.b64encode(bytes(username,"utf_8"))           # Encoding the username and password before writing to file
+        #password=base64.b64encode(bytes(password,"utf_8"))
         print(username,file=configfile)
         print(password,file=configfile)
         configfile.close()
+
+    def showHelp(self):                                               # Method to show the help messages
+        print("Configure username and password           gmailnotify.py --config")
+        print("About                                     gmailnotify.py --about")
+
+    def showAbout(self):                                              #Method to show about messages
+        print("GmailNotify 1.0 ")
+        print("By Tapan Prakash T")
+        print("Email:tapanprakasht@gmail.com")
+        print("Gmailnotify is a terminal based Gmail notifier written in python.")
 
 def main():
 
@@ -88,16 +104,16 @@ def main():
         print("gmailnotify.py takes only one argument.Try ' gmailnotify.py --help' for help")
     elif len(sys.argv)==2:
         if sys.argv[1]=='--help':                               #If commadline arg is --help
-            print("help")
+            g.showHelp()
         elif sys.argv[1]=='--about':                            #If commadline arg is --about
-            print("About")
+            g.showAbout()
         elif sys.argv[1]=='--config':                           #If commadline arg is --config
             print("Configuration")
             g.createConfig()
         elif len(sys.argv)==2:                                  #If commadline arg is invalid
             print("Invalid argument")
     else:                                                       # If there is no command line argument
-        if g.getUsercredentials():
-            g.pasrseXml()
+        if g.getUsercredentials():                              # Check whether username and password file exist.
+            g.pasrseXml()                                       #Start parsing the data
 
 if __name__=="__main__":main()
