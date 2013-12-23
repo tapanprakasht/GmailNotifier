@@ -12,16 +12,27 @@ How to install
 Copy gmailnotify.py and install.py to a folder.
 
 Open terminal.
+
 Chage directory to the directory containing the copied file.
+
 Run the following command
+
     python3 install.py
+    
 ->Inorder to configure username and password for your Gmail account run 
+
     gmailnotify --config
+    
 ->Run gmailnotify by the command
+
     gmailnotify
+    
 ->To get help 
+
     gmailnotify --help
+    
 ->To get about message
+
     gmailnotify --about
 
 
