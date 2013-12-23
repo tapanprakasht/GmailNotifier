@@ -10,6 +10,7 @@ Inorder to run gmailnotify you require python3 installed in your system.
 How to install
 ------------------
 Copy gmailnotify.py and install.py to a folder.
+
 Open terminal.
 Chage directory to the directory containing the copied file.
 Run the following command
