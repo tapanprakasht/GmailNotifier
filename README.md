@@ -18,7 +18,9 @@ Chage directory to the directory containing the copied file.
 Run the following command
 
     python3 install.py
-    
+
+Restart terminal before using below commands
+
 ->Inorder to configure username and password for your Gmail account run 
 
     gmailnotify --config
