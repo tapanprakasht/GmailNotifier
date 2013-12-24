@@ -11,6 +11,7 @@ def main():
         bashrc=open(os.path.expanduser("~")+"/.bashrc",'a')                                    #Open .bashrc file in append mode
         bashrc.write("alias gmailnotify=\"/usr/bin/python3 ~/.gmailnotify.py\"")                  # Write alias to .bashrc file
         print("Installation finished")
+        print("Restart terminal before using below commands")
         print("Use \'gmailnotify --config\' to configure username and password for your account")
         print("Use \'gmailnotify\' to run Gmailnotify")
     except:
